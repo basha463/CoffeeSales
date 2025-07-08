@@ -1,7 +1,7 @@
 # CoffeeSales
 This project analyzes a coffee company’s sales data. It covers trends, product performance, and profitability across different dimensions.
 
-Clean and format the date.
+Clean and format the data.
 
 Track year-on-year (YoY) and month-on-month sales trends.
 

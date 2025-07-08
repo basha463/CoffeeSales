@@ -1,0 +1,95 @@
+select * from coffee_sales;
+-- 1. year-on-year sales 
+
+select year(Date) as year, sum(Sales) as total_sales
+from coffee_sales c
+group by 1
+order by 1;
+
+-- the company has seen increase in sales till 2014 and then it declined in 2015
+
+select date,str_to_date(Date,"%m/%d/%Y")
+from coffee_sales;
+
+-- str_to_date --> converts text to date type 
+
+-- clean date column
+ 
+SET SQL_SAFE_UPDATES = 0; -- disabling the safe mode
+ 
+UPDATE coffee_sales 
+SET Date = STR_TO_DATE(Date, '%m/%d/%Y');
+
+select * from coffee_sales;
+
+-- Query for YoY Percentage Change 
+
+WITH yearly_sales AS (
+    SELECT 
+        YEAR(STR_TO_DATE(Date, '%m/%d/%Y')) AS year, 
+        SUM(Sales) AS total_sales
+    FROM 
+        coffee_sales
+    GROUP BY 
+        YEAR(STR_TO_DATE(Date, '%m/%d/%Y'))
+)
+SELECT 
+    year,
+    total_sales,
+    LAG(total_sales) OVER (ORDER BY year) AS previous_year_sales,
+    ROUND(
+        (total_sales - LAG(total_sales) OVER (ORDER BY year)) 
+        / LAG(total_sales) OVER (ORDER BY year) * 100, 
+        2
+    ) AS yoy_percentage_change
+FROM 
+    yearly_sales
+ORDER BY 
+    year;
+
+
+-- monhtly sales
+
+select monthname(Date) as month, sum(Sales) as total_sales
+from coffee_sales c
+group by 1;
+
+-- what are the different products 
+
+select distinct Product from coffee_sales;
+
+-- produuct vs sales
+
+select Product, sum(Sales) as total_sales
+ from coffee_sales
+ group by 1
+ order by 2 desc;
+
+
+-- find the best  performing product lines by total profit 
+select product_line,sum(profit) as total_profit 
+from coffee_sales 
+group by product_line 
+order by 2 desc;
+
+-- compare actual vs target sales across different states 
+with cte as(
+select state,sum(sales) as actual_sales,sum(Target_sales) as target_sales
+from coffee_sales 
+group by state)
+select *,(actual_sales-target_sales) as difference
+from cte 
+order by difference;
+-- products with highest average margin 
+select product,round(avg(margin),2) as avg_margin
+from coffee_sales 
+group by product 
+order by avg_margin desc
+limit 5;
+
+-- average margin vs marketing expenses 
+select Product_line,avg( Margin ) as avg_margin,avg(Marketing) as avg_marketing_expenses 
+from coffee_sales 
+group by product_line 
+order by avg_margin;
+

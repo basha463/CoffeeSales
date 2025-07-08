@@ -6,8 +6,6 @@ from coffee_sales c
 group by 1
 order by 1;
 
--- the company has seen increase in sales till 2014 and then it declined in 2015
-
 select date,str_to_date(Date,"%m/%d/%Y")
 from coffee_sales;
 
